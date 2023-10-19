@@ -1,27 +1,38 @@
 package com.pluralsight;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
 public class SearchInventory {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         ArrayList<Product> inventory = getInventory();
+        BufferedReader readFile = new BufferedReader(new FileReader("src/main/resources/inventory.csv"));
+        String input = "";
+        int productID = 0;
+        String productName = "";
+        float productPrice;
 
-        inventory.add(new Product(1,"Banana", 2.56f));
-        inventory.add(new Product(2, "kiwi", 5.50f));
-        inventory.add(new Product(3, "eggPlant", 3.50f));
-        inventory.add(new Product(4, "apple", 6.50f));
-        inventory.add(new Product(2, "orange", 1.50f));
+        while((input = readFile.readLine()) != null){
+            String[] temp = input.split("\\|");
+            productName = temp[1];
+            productPrice = Float.parseFloat(temp[2]);
+            productID = Integer.parseInt(temp[0]);
+            inventory.add(new Product(productID, productName, productPrice));
+        }
+        readFile.close();
 
-        Collections.sort(inventory, (p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()));
+        inventory.sort((p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()));
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("We carry the following inventory: ");
-        for (int i = 0; i < inventory.size(); i++) {
-            Product p = inventory.get(i);
-            System.out.printf("id: %d %s - Price: $%.2f",
+        for (Product p : inventory) {
+            System.out.printf("id: %d %s - Price: $%.2f\n",
                     p.getId(), p.getName(), p.getPrice());
         }
     }
